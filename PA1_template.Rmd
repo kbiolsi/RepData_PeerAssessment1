@@ -1,7 +1,12 @@
 ##Reproducible Research - Project 1 
-Examine data collected from a personal activity monitoring device for October and November, 2012. The device collected data at 5-minute intervals and recorded the number of steps taken during each interval.  
+Examine data collected from a personal activity monitoring device for October and November, 2012. The device collected data at 5-minute intervals and recorded the number of steps taken during each interval.
+```{r echo=FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE)
+```
 <br />
-Load the necessary packages.
+
+###Load the necessary packages.
 
 ```{r warning=FALSE, results="hide"}
 library(plyr)     # Needed for ddply() and join()
@@ -9,17 +14,18 @@ library(lattice)  # Needed for xyplot()
 ```
 <br />
 
-Read the data file.
-```{r results="hide"}
+###Read the data file.  
+```{r readData, results="hide"}
 setwd("c:/RProg/RR-proj1")   
 stepData<-read.csv("activity.csv",header=TRUE)
+stepData$date<-as.Date(stepData$date)
 ```
 <br />  
 
-###Steps taken per day  
+###Examine steps taken per day.
 
 Calculate the total number of steps taken on each of the 61 days and plot in a histogram.
-```{r}
+```{r histogram1}
 totalStepsPerDay<-ddply(stepData,~date,summarize,sum=sum(steps),na.rm=TRUE)
 hist(totalStepsPerDay$sum,ylim=c(0,35),main="Histogram of Total Steps Per Day",
      xlab="Total steps per day")
@@ -27,16 +33,16 @@ hist(totalStepsPerDay$sum,ylim=c(0,35),main="Histogram of Total Steps Per Day",
 <br />
 
 Compute the mean and median of the total number of steps taken each day.
-```{r}
+```{r mean_median}
 cat(c("Mean of total steps per day = ",format(mean(totalStepsPerDay$sum,na.rm=TRUE),nsmall=2)))
 cat(c("Median of total steps per day = ",format(median(totalStepsPerDay$sum,na.rm=TRUE),nsmall=2)))
 ```
 <br />  
 
-###Average daily activity pattern  
+###Examine the average daily activity pattern.
 
 Construct a time-series plot of the 5-minute intervals and the average number of steps taken, averaged across all days.
-```{r}
+```{r timeseries1}
 meanStepsByInterval<-ddply(stepData,~interval,summarize,mean=mean(steps,na.rm=TRUE))
 plot(mean~interval,data=meanStepsByInterval,type="l",xlab="5-minute interval",
      ylab="Mean number of steps taken",main="Mean number of steps by 5-minute interval")
@@ -44,7 +50,7 @@ plot(mean~interval,data=meanStepsByInterval,type="l",xlab="5-minute interval",
 <br />
 
 Determine which 5-minute inteval contains the maximum average value.
-```{r}
+```{r maxvalue}
 maxIndex<-which.max(meanStepsByInterval$mean)   # Find the index of the maximum mean
 maxInterval<-meanStepsByInterval$interval[maxIndex]  
 cat(c("The 5-minute interval with the highest mean number of steps is interval",
@@ -53,17 +59,17 @@ cat(c("The 5-minute interval with the highest mean number of steps is interval",
 ```
 <br />
 
-###Imputing missing values
+###Impute missing values.
 
 Calculate and report the total number of missing values in the dataset.
-```{r}
+```{r countmissing}
 countNA<-sum(is.na(stepData$steps))   # Count number of missing values for 'steps' variable
 cat("The number of missing values for the 'steps' variable is",countNA)
 ```
 <br />
 
 Create a new dataset, in which the missing values for number of steps are replaced by the mean number of steps for the given 5-minute interval.
-```{r}
+```{r impute_missing}
 mergedData<-join(stepData,meanStepsByInterval,by="interval")
 imputedData<-mergedData
 imputedData$steps[is.na(mergedData$steps)]<-imputedData$mean[is.na(mergedData$steps)]
@@ -71,14 +77,15 @@ imputedData$steps[is.na(mergedData$steps)]<-imputedData$mean[is.na(mergedData$st
 <br />
 
 Compute the total number of steps per day in the imputed data set and construct a histogram.
-```{r}
+```{r histogram2}
 totalStepsPerDayImputed<-ddply(imputedData,~date,summarize,sum=sum(steps),na.rm=TRUE)
-hist(totalStepsPerDayImputed$sum,ylim=c(0,35),main="Histogram of Total Steps Per Day for Imputed Data",xlab="Total steps per day")
+hist(totalStepsPerDayImputed$sum,ylim=c(0,35),
+     main="Histogram of Total Steps Per Day for Imputed Data",xlab="Total steps per day")
 ```
 <br />
 
 Compute the mean and median of the total steps per day for the imputed data set and compare to the mean and median prior to imputation.
-```{r}
+```{r mean_median2}
 cat("Unimputed mean:",format(mean(totalStepsPerDay$sum,na.rm=TRUE),nsmall=2),
     "   Imputed mean:",format(mean(totalStepsPerDayImputed$sum,na.rm=TRUE),nsmall=2))
 cat("Unimputed median:",format(median(totalStepsPerDay$sum,na.rm=TRUE),nsmall=2),
@@ -86,7 +93,7 @@ cat("Unimputed median:",format(median(totalStepsPerDay$sum,na.rm=TRUE),nsmall=2)
 ```
 <br />
 
-###Differences in activity patterns for weekends vs. weekdays  
+###Examine differences in activity patterns for weekends vs. weekdays.
 
 Create a new factor with two levels, "weekday" and "weekend".
 ```{r}
@@ -98,7 +105,7 @@ imputedData$partOfWeek=as.factor(timeOfWeek)    # Add the weekend/weekday variab
 <br />
 
 Using the imputed data, compute mean number of steps by each 5-minute interval for weekdays and weekends and display these in a time series plot.
-```{r}
+```{r timeseries2}
 meanStepsByIntervalImputed<-ddply(imputedData,~interval+partOfWeek,summarize,mean=mean(steps,na.rm=TRUE))
 xyplot(mean~interval | partOfWeek,data=meanStepsByIntervalImputed,type="l",
        layout=c(1,2),ylab="Mean number of steps")

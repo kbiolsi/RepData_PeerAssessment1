@@ -1,7 +1,9 @@
 ##Reproducible Research - Project 1 
-Examine data collected from a personal activity monitoring device for October and November, 2012. The device collected data at 5-minute intervals and recorded the number of steps taken during each interval.  
+Examine data collected from a personal activity monitoring device for October and November, 2012. The device collected data at 5-minute intervals and recorded the number of steps taken during each interval.
+
 <br />
-Load the necessary packages.
+
+###Load the necessary packages.
 
 
 ```r
@@ -10,15 +12,16 @@ library(lattice)  # Needed for xyplot()
 ```
 <br />
 
-Read the data file.
+###Read the data file.  
 
 ```r
 setwd("c:/RProg/RR-proj1")   
 stepData<-read.csv("activity.csv",header=TRUE)
+stepData$date<-as.Date(stepData$date)
 ```
 <br />  
 
-###Steps taken per day  
+###Examine steps taken per day.
 
 Calculate the total number of steps taken on each of the 61 days and plot in a histogram.
 
@@ -28,7 +31,7 @@ hist(totalStepsPerDay$sum,ylim=c(0,35),main="Histogram of Total Steps Per Day",
      xlab="Total steps per day")
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
+![plot of chunk histogram1](figure/histogram1-1.png) 
 <br />
 
 Compute the mean and median of the total number of steps taken each day.
@@ -50,7 +53,7 @@ cat(c("Median of total steps per day = ",format(median(totalStepsPerDay$sum,na.r
 ```
 <br />  
 
-###Average daily activity pattern  
+###Examine the average daily activity pattern.
 
 Construct a time-series plot of the 5-minute intervals and the average number of steps taken, averaged across all days.
 
@@ -60,7 +63,7 @@ plot(mean~interval,data=meanStepsByInterval,type="l",xlab="5-minute interval",
      ylab="Mean number of steps taken",main="Mean number of steps by 5-minute interval")
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+![plot of chunk timeseries1](figure/timeseries1-1.png) 
 <br />
 
 Determine which 5-minute inteval contains the maximum average value.
@@ -78,7 +81,7 @@ cat(c("The 5-minute interval with the highest mean number of steps is interval",
 ```
 <br />
 
-###Imputing missing values
+###Impute missing values.
 
 Calculate and report the total number of missing values in the dataset.
 
@@ -105,10 +108,11 @@ Compute the total number of steps per day in the imputed data set and construct 
 
 ```r
 totalStepsPerDayImputed<-ddply(imputedData,~date,summarize,sum=sum(steps),na.rm=TRUE)
-hist(totalStepsPerDayImputed$sum,ylim=c(0,35),main="Histogram of Total Steps Per Day for Imputed Data",xlab="Total steps per day")
+hist(totalStepsPerDayImputed$sum,ylim=c(0,35),
+     main="Histogram of Total Steps Per Day for Imputed Data",xlab="Total steps per day")
 ```
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
+![plot of chunk histogram2](figure/histogram2-1.png) 
 <br />
 
 Compute the mean and median of the total steps per day for the imputed data set and compare to the mean and median prior to imputation.
@@ -132,7 +136,7 @@ cat("Unimputed median:",format(median(totalStepsPerDay$sum,na.rm=TRUE),nsmall=2)
 ```
 <br />
 
-###Differences in activity patterns for weekends vs. weekdays  
+###Examine differences in activity patterns for weekends vs. weekdays.
 
 Create a new factor with two levels, "weekday" and "weekend".
 
@@ -152,4 +156,4 @@ xyplot(mean~interval | partOfWeek,data=meanStepsByIntervalImputed,type="l",
        layout=c(1,2),ylab="Mean number of steps")
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
+![plot of chunk timeseries2](figure/timeseries2-1.png) 
