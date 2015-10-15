@@ -1,4 +1,4 @@
-##Reproducible Research - Project 1##  
+##Reproducible Research - Project 1 
 Examine data collected from a personal activity monitoring device for October and November, 2012. The device collected data at 5-minute intervals and recorded the number of steps taken during each interval.  
 <br />
 Load the necessary packages.
@@ -18,7 +18,7 @@ stepData<-read.csv("activity.csv",header=TRUE)
 ```
 <br />  
 
-###Steps taken per day###  
+###Steps taken per day  
 
 Calculate the total number of steps taken on each of the 61 days and plot in a histogram.
 
@@ -50,7 +50,7 @@ cat(c("Median of total steps per day = ",format(median(totalStepsPerDay$sum,na.r
 ```
 <br />  
 
-###Average daily activity pattern###  
+###Average daily activity pattern  
 
 Construct a time-series plot of the 5-minute intervals and the average number of steps taken, averaged across all days.
 
@@ -78,7 +78,7 @@ cat(c("The 5-minute interval with the highest mean number of steps is interval",
 ```
 <br />
 
-###Imputing missing values###
+###Imputing missing values
 
 Calculate and report the total number of missing values in the dataset.
 
@@ -132,7 +132,7 @@ cat("Unimputed median:",format(median(totalStepsPerDay$sum,na.rm=TRUE),nsmall=2)
 ```
 <br />
 
-###Differences in activity patterns for weekends vs. weekdays###
+###Differences in activity patterns for weekends vs. weekdays  
 
 Create a new factor with two levels, "weekday" and "weekend".
 
