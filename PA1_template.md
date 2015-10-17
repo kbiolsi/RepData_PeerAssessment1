@@ -15,7 +15,7 @@ library(lattice)  # Needed for xyplot()
 ###Read the data file.  
 
 ```r
-setwd("c:/RProg/RR-proj1")   
+setwd("c:/RProg/RR-proj1")   # Change to your own working directory
 stepData<-read.csv("activity.csv",header=TRUE)
 stepData$date<-as.Date(stepData$date)
 ```
@@ -27,8 +27,10 @@ Calculate the total number of steps taken on each of the 61 days and plot in a h
 
 ```r
 totalStepsPerDay<-ddply(stepData,~date,summarize,sum=sum(steps),na.rm=TRUE)
-hist(totalStepsPerDay$sum,ylim=c(0,35),main="Histogram of Total Steps Per Day",
-     xlab="Total steps per day")
+hist(totalStepsPerDay$sum,ylim=c(0,25),main="Histogram of Total Steps Per Day",
+     breaks=10,xaxt='n',xlab="Total steps per day")
+axis(side=1, at=c(0,4000,8000,12000,16000,20000,24000),
+     labels=c("0","4,000","8,000","12,000","16,000","20,000","24,000"))
 ```
 
 ![plot of chunk histogram1](figure/histogram1-1.png) 
@@ -101,6 +103,12 @@ Create a new dataset, in which the missing values for number of steps are replac
 mergedData<-join(stepData,meanStepsByInterval,by="interval")
 imputedData<-mergedData
 imputedData$steps[is.na(mergedData$steps)]<-imputedData$mean[is.na(mergedData$steps)]
+# Check that the number of missing values is now zero
+cat("The number of missing values in the imputed data set is",sum(is.na(imputedData$steps)))
+```
+
+```
+## The number of missing values in the imputed data set is 0
 ```
 <br />
 
@@ -108,8 +116,11 @@ Compute the total number of steps per day in the imputed data set and construct 
 
 ```r
 totalStepsPerDayImputed<-ddply(imputedData,~date,summarize,sum=sum(steps),na.rm=TRUE)
-hist(totalStepsPerDayImputed$sum,ylim=c(0,35),
-     main="Histogram of Total Steps Per Day for Imputed Data",xlab="Total steps per day")
+hist(totalStepsPerDayImputed$sum,ylim=c(0,25),breaks=10,
+     main="Histogram of Total Steps Per Day for Imputed Data",xaxt='n',
+     xlab="Total steps per day")
+axis(side=1, at=c(0,4000,8000,12000,16000,20000,24000),
+     labels=c("0","4,000","8,000","12,000","16,000","20,000","24,000"))
 ```
 
 ![plot of chunk histogram2](figure/histogram2-1.png) 
@@ -134,7 +145,8 @@ cat("Unimputed median:",format(median(totalStepsPerDay$sum,na.rm=TRUE),nsmall=2)
 ```
 ## Unimputed median: 10765    Imputed median: 10766.19
 ```
-<br />
+Imputing the missing values for number of steps walked has very little effect on the measures of central tendency. The mean remains unchanged and the median changes only very slightly, with the median for the imputed data set being identical to the mean.  
+<br />  
 
 ###Examine differences in activity patterns for weekends vs. weekdays.
 
@@ -153,7 +165,8 @@ Using the imputed data, compute mean number of steps by each 5-minute interval f
 ```r
 meanStepsByIntervalImputed<-ddply(imputedData,~interval+partOfWeek,summarize,mean=mean(steps,na.rm=TRUE))
 xyplot(mean~interval | partOfWeek,data=meanStepsByIntervalImputed,type="l",
-       layout=c(1,2),ylab="Mean number of steps")
+       layout=c(1,2),ylab="Mean number of steps",xlab="5-minute interval",
+       main="Mean number of steps by 5-minute interval")
 ```
 
 ![plot of chunk timeseries2](figure/timeseries2-1.png) 
